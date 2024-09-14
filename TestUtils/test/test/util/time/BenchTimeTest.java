@@ -2,19 +2,15 @@ package test.util.time;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
-import java.lang.reflect.Field;
-
 import org.junit.Before;
 import org.junit.jupiter.api.Test;
+import common.helper.ReflectUtils;
 
 public class BenchTimeTest {
 	
 	@Before
 	public void setUp() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
-    	Field instance = BenchTime.class.getDeclaredField("instance");
-    	instance.setAccessible(true);
-    	instance.set(BenchTime.newInstance(), null);
+		ReflectUtils.setValueInField(BenchTime.newInstance(), "instance", null);
 	}
 	
 	
@@ -27,21 +23,15 @@ public class BenchTimeTest {
     @Test
     public void start001() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
     	BenchTime.newInstance().start();
-    	Field startTime = BenchTime.class.getDeclaredField("startTime");
-    	startTime.setAccessible(true);
-    	long val = (long) startTime.get(BenchTime.newInstance());
+    	long val = (long) ReflectUtils.getValueInField(BenchTime.newInstance(), "startTime");
     	assertTrue(val > 0);
     }
     
     @Test
     public void stop001() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
-    	Field isMeasured = BenchTime.class.getDeclaredField("isMeasured");
-    	isMeasured.setAccessible(true);
-    	isMeasured.set(BenchTime.newInstance(), true);
+    	ReflectUtils.setValueInField(BenchTime.newInstance(), "isMeasured", true);
     	BenchTime.newInstance().stop();
-    	Field stopTime = BenchTime.class.getDeclaredField("stopTime");
-    	stopTime.setAccessible(true);
-    	long val = (long) stopTime.get(BenchTime.newInstance());
+    	long val = (long) ReflectUtils.getValueInField(BenchTime.newInstance(), "stopTime");
     	assertTrue(val > 0);
     }
     
@@ -56,15 +46,37 @@ public class BenchTimeTest {
     
     @Test
     public void stop003() throws InterruptedException, IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException {
-    	    Field startTime = BenchTime.class.getDeclaredField("startTime");
-    	    startTime.setAccessible(true);
-    	    startTime.set(BenchTime.newInstance(), System.currentTimeMillis());
-        	Field isMeasured = BenchTime.class.getDeclaredField("isMeasured");
-        	isMeasured.setAccessible(true);
-        	isMeasured.set(BenchTime.newInstance(), true);
-        	Thread.sleep(1);
-    	    long res = BenchTime.newInstance().stop();
-    	    assertTrue(res > 0);
+        ReflectUtils.setValueInField(BenchTime.newInstance(), "isMeasured", true);
+    	ReflectUtils.setValueInField(BenchTime.newInstance(), "startTime", System.currentTimeMillis());
+        Thread.sleep(1);
+    	long res = BenchTime.newInstance().stop();
+    	assertTrue(res > 0);
     }
+    
+    @Test
+    public void stop004() throws InterruptedException, IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException {
+        try {
+    	    ReflectUtils.setValueInField(BenchTime.newInstance(), "isMeasured", true);
+    	    ReflectUtils.setValueInField(BenchTime.newInstance(), "startTime", System.currentTimeMillis()+1000);
+            Thread.sleep(1);
+    	    BenchTime.newInstance().stop();
+        }catch (RuntimeException e) {
+    	    assertEquals(e.getMessage(), "The start time is later than the end time.");
+        }
+    }
+    
+    @Test
+    public void print001() throws InterruptedException, IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException {
+        try {  	
+        	ReflectUtils.setValueInField(BenchTime.newInstance(), "isMeasured", false);
+    	    ReflectUtils.setValueInField(BenchTime.newInstance(), "startTime", 10L);
+    	    ReflectUtils.setValueInField(BenchTime.newInstance(), "stopTime", 1L);
+    	    BenchTime.newInstance().print();
+        }catch (RuntimeException e) {
+    	    assertEquals(e.getMessage(), "The start time is later than the end time.");
+        }
+    }
+    
+    
     
 }

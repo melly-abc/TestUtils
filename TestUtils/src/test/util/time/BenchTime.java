@@ -62,6 +62,7 @@ public class BenchTime {
     	stopTime = System.currentTimeMillis();
     	if (! isMeasured) throw new RuntimeException("The measurement has not been started.");
     	isMeasured = false;
+    	if (stopTime < startTime) throw new RuntimeException("The start time is later than the end time.");
     	return stopTime - startTime;
     }
     
@@ -72,6 +73,7 @@ public class BenchTime {
      */
     public void print() {
     	if (isMeasured) throw new RuntimeException("The measurement has not been ended.");
+    	if (stopTime < startTime) throw new RuntimeException("The start time is later than the end time.");
     	System.out.println(""+(stopTime - startTime)+"ms");
     }
 }
