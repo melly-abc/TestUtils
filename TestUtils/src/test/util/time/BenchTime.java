@@ -2,6 +2,11 @@ package test.util.time;
 
 import java.util.Objects;
 
+/**
+ * ベンチマーク計測機能<br> 
+ * <br>
+ *  ベンチマークを計測する機能<br>
+ */
 public class BenchTime {
     static BenchTime instance = null;
     private long startTime = 0, stopTime = 0;
